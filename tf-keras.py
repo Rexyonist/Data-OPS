@@ -1,16 +1,18 @@
 import numpy as np
 import joblib
 import pandas as pd
+import matplotlib.pyplot as plt
 from textblob import TextBlob
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay 
 
 # Load the dataset
 print("Loading dataset...")
-df = pd.read_csv('output/labelled_data.csv')
+df = pd.read_csv('output/translated_cleaned.csv')
+df.to_csv()
 print("Dataset loaded.")
 
 def assign_sentiment(text):
@@ -22,10 +24,10 @@ def assign_sentiment(text):
     else:
         return 'negative'
 
-df['sentiment'] = df['label'].apply(assign_sentiment)
+df['sentiment'] = df['translated'].apply(assign_sentiment)
 
 # Split the data into features (X) and labels (y)
-X = df['label']
+X = df['translated']
 sentiment_mapping = {'positive': 0, 'neutral': 1, 'negative': 2}
 y = df['sentiment'].map(sentiment_mapping).astype(int)
 
@@ -45,7 +47,7 @@ model = Sequential([
     Dropout(0.2),
     Dense(64, activation='relu'),
     Dropout(0.2),
-    Dense(3, activation='softmax')  # 3 classes: positive, neutral, negative
+    Dense(3, activation='softmax')
 ])
 print("Keras model built.")
 
@@ -74,8 +76,10 @@ print("Calculating confusion matrix...")
 conf_matrix = confusion_matrix(y_test, y_pred)
 
 # Display the confusion matrix
-print("Confusion Matrix (TP, FN, FP, TN):")
-print(conf_matrix)
+cm_display = ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=["positive", "neutral", "negative"])
+cm_display.plot()
+plt.title("Confusion Matrix - Multinomial Naive Bayes")
+plt.savefig("output/Confusion_Matrix_Multinomial_Naive_Bayes.png")
 
 # Interpret the confusion matrix
 TP = conf_matrix[0, 0]  # True positives for class 0

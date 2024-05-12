@@ -9,7 +9,8 @@ from textblob import TextBlob
 import joblib
 
 # Load the dataset
-df = pd.read_csv('output/labelled_data.csv')
+df = pd.read_excel('output/excel-data.xlsx')
+df.to_csv
 
 def assign_sentiment(text):
     analysis = TextBlob(text)
@@ -20,11 +21,11 @@ def assign_sentiment(text):
     else:
         return 'negative'
 
-df['sentiment'] = df['label'].apply(assign_sentiment)
+df['sentiment'] = df['cleared_translate'].apply(assign_sentiment)
 
-# Split the data into features (X) and labels (y)
-X = df['label']
-y = df['sentiment']  # Ensure this column exists and contains correct target labels
+# Split the data into features (X) and cleared_translates (y)
+X = df['cleared_translate']
+y = df['sentiment']  # Ensure this column exists and contains correct target cleared_translates
 print("Setting up TfidfVectorizer and models...")
 
 # Define the preprocessing and models pipelines
